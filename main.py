@@ -36,7 +36,6 @@ sites = [
     ("Serienfans", "https://serienfans.org/"),
     ("Byte", "https://byte.to/"),
     ("DDownload", "https://ddownload.com/"),
-    ("NOX", "https://nox.to/"),
     ("1fichier", "https://1fichier.com/"),
     ("Rapidgator", "https://rapidgator.net/site/index"),
 ]

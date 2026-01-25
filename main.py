@@ -38,6 +38,9 @@ sites = [
     ("DDownload", "https://ddownload.com/"),
     ("1fichier", "https://1fichier.com/"),
     ("Rapidgator", "https://rapidgator.net/site/index"),
+    ("NOX.TV", "https://nox.to/"),
+    ("DLPSGAME", "https://dlpsgame.com/"),
+    ("IGG-GAMES", "https://igg-games.com/"),
 ]
 
 for name, url in sites:

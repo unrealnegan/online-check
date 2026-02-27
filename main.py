@@ -1,32 +1,40 @@
-import requests
+import cloudscraper
 from colorama import Fore, init
 
 init(autoreset=True)
 
 def check_website_status(url, name):
+    scraper = cloudscraper.create_scraper(
+        browser={
+            'browser': 'chrome',
+            'platform': 'windows',
+            'desktop': True
+        }
+    )
+    
     try:
-        response = requests.get(url, timeout=10)
+        response = scraper.get(url, timeout=15)
         
         if response.status_code == 200:
-            print(f"[{name}] {Fore.GREEN}ONLINE")
+            print(f"[{name:12}] {Fore.GREEN}ONLINE")
         else:
-            print(f"[{name}] {Fore.RED}OFFLINE - Fehlercode: {response.status_code} ({get_error_description(response.status_code)})")
+            desc = get_error_description(response.status_code)
+            print(f"[{name:12}] {Fore.RED}OFFLINE - Status: {response.status_code} ({desc})")
     
-    except requests.exceptions.RequestException as e:
-        print(f"[{name}] {Fore.RED}Fehler beim Überprüfen der Website: {e}")
+    except Exception as e:
+        print(f"[{name:12}] {Fore.RED}Fehler: Verbindung fehlgeschlagen")
 
 def get_error_description(code):
     error_descriptions = {
         400: "Bad Request",
         401: "Unauthorized",
-        403: "Forbidden",
+        403: "Forbidden (Cloudflare Block?)",
         404: "Not Found",
-        408: "Request Timeout",
         429: "Too Many Requests",
         500: "Internal Server Error",
-        502: "Bad Gateway",
-        503: "Service Unavailable",
-        504: "Gateway Timeout"
+        503: "Service Unavailable (Wartungsmodus)",
+        520: "Web server is returning an unknown error (Cloudflare)",
+        521: "Web server is down (Cloudflare)",
     }
     return error_descriptions.get(code, "Unbekannter Fehler")
 
@@ -37,11 +45,14 @@ sites = [
     ("Byte", "https://byte.to/"),
     ("DDownload", "https://ddownload.com/"),
     ("1fichier", "https://1fichier.com/"),
-    ("Rapidgator", "https://rapidgator.net/site/index"),
+    ("Rapidgator", "https://rapidgator.net/"),
     ("NOX.TV", "https://nox.to/"),
     ("DLPSGAME", "https://dlpsgame.com/"),
     ("IGG-GAMES", "https://igg-games.com/"),
 ]
+
+print(f"{'SITE':<14} | STATUS")
+print("-" * 25)
 
 for name, url in sites:
     check_website_status(url, name)

@@ -1,42 +1,27 @@
-import cloudscraper
+import socket
+from urllib.parse import urlparse
 from colorama import Fore, init
 
 init(autoreset=True)
 
 def check_website_status(url, name):
-    scraper = cloudscraper.create_scraper(
-        browser={
-            'browser': 'chrome',
-            'platform': 'windows',
-            'desktop': True
-        }
-    )
-    
     try:
-        response = scraper.get(url, timeout=15)
-        
-        if response.status_code == 200:
-            print(f"[{name:12}] {Fore.GREEN}ONLINE")
-        else:
-            desc = get_error_description(response.status_code)
-            print(f"[{name:12}] {Fore.RED}OFFLINE - Status: {response.status_code} ({desc})")
-    
-    except Exception as e:
-        print(f"[{name:12}] {Fore.RED}Fehler: Verbindung fehlgeschlagen")
+        parsed = urlparse(url)
+        host = parsed.netloc or parsed.path
 
-def get_error_description(code):
-    error_descriptions = {
-        400: "Bad Request",
-        401: "Unauthorized",
-        403: "Forbidden (Cloudflare Block?)",
-        404: "Not Found",
-        429: "Too Many Requests",
-        500: "Internal Server Error",
-        503: "Service Unavailable (Wartungsmodus)",
-        520: "Web server is returning an unknown error (Cloudflare)",
-        521: "Web server is down (Cloudflare)",
-    }
-    return error_descriptions.get(code, "Unbekannter Fehler")
+        socket.create_connection((host, 443), timeout=5).close()
+
+        print(f"[{name:12}] {Fore.GREEN}ONLINE")
+
+    except socket.gaierror:
+        print(f"[{name:12}] {Fore.RED}OFFLINE - DNS Fehler")
+
+    except TimeoutError:
+        print(f"[{name:12}] {Fore.RED}OFFLINE - Timeout")
+
+    except OSError:
+        print(f"[{name:12}] {Fore.RED}OFFLINE - Server nicht erreichbar")
+
 
 sites = [
     ("DDL-Warez", "https://ddl-warez.cc/"),
